@@ -1,6 +1,8 @@
 import javax.swing.JFrame;
 
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
@@ -9,6 +11,7 @@ public class Maze extends JFrame implements Runnable{
     private final int MAP_HEIGHT = 15;
     private final int IMG_WIDTH = 640;
     private final int IMG_HEIGHT = 400;
+    private final double NANO_SEC = 1000000000.0 / 60.0; // fresh rate for the window, 60 times a sec
 
     private Thread thread;
     private BufferedImage img; // variable that holds the texture
@@ -52,10 +55,61 @@ public class Maze extends JFrame implements Runnable{
         start();
     }
 
+    /**
+     * Start the maze with a new thread
+     */
+    private synchronized void start(){
+        isRunning = true;
+        thread.start();
+    }
+
+    /**
+     * Terminate the maze and recycle all the threads
+     */
+    public synchronized void stop(){
+        isRunning = false;
+
+        try {
+            thread.join();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Create the buffer strategy for the view if it's null. If there exist a buffer, render with the new img
+     */
+    public void render(){
+        BufferStrategy bufferStrategy = getBufferStrategy();
+
+        if(bufferStrategy == null){
+            createBufferStrategy(3);
+        }else{
+            Graphics graphics = bufferStrategy.getDrawGraphics();
+            graphics.drawImage(img, 0, 0, img.getWidth(), img.getHeight(), null);
+            bufferStrategy.show();
+        }
+    }
+
     @Override
     public void run() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'run'");
+        long lastTime = System.nanoTime();
+        double delta = 0;
+        requestFocus();
+
+        while(isRunning){
+            long now = System.nanoTime();
+            delta += ((now - lastTime) / NANO_SEC);
+
+            lastTime = now;
+            // update mostly 60 times in each sec
+            while(delta >= 1){
+
+
+                delta --;
+            }
+            render();
+        }
     }
     
 }
