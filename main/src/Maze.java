@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.ArrayList;
 
 public class Maze extends JFrame implements Runnable{
     private final int MAP_WIDTH = 15;
@@ -35,6 +36,7 @@ public class Maze extends JFrame implements Runnable{
 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
 			{1,1,1,1,1,1,1,4,4,4,4,4,4,4,4}
     };
+    private ArrayList<Texture> textures;
 
     /**
      * Constructor of Maze
@@ -43,6 +45,11 @@ public class Maze extends JFrame implements Runnable{
         thread = new Thread(this);
         img = new BufferedImage(IMG_WIDTH, IMG_HEIGHT, BufferedImage.TYPE_INT_RGB);
         pixels = ((DataBufferInt)img.getRaster().getDataBuffer()).getData(); // get the pixels from img
+
+        textures = new ArrayList<Texture>();
+        textures.add(Texture.brick);
+        textures.add(Texture.brick2);
+        textures.add(Texture.brick_moss);
 
         // properties for the JFrame
         setSize(IMG_WIDTH, IMG_HEIGHT);
