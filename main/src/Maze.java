@@ -8,6 +8,9 @@ import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
 
 public class Maze extends JFrame implements Runnable{
+    public static final int MAP_WALL = 1;
+    public static final int MAP_ROAD = 0;
+
     private final int MAP_WIDTH = 15;
     private final int MAP_HEIGHT = 15;
     private final int IMG_WIDTH = 640;
@@ -37,6 +40,7 @@ public class Maze extends JFrame implements Runnable{
 			{1,1,1,1,1,1,1,4,4,4,4,4,4,4,4}
     };
     private ArrayList<Texture> textures;
+    private Player player;
 
     /**
      * Constructor of Maze
@@ -50,6 +54,9 @@ public class Maze extends JFrame implements Runnable{
         textures.add(Texture.brick);
         textures.add(Texture.brick2);
         textures.add(Texture.brick_moss);
+
+        // default start point
+        player = new Player(4.5, 4.5, 1, 0, 0, -.66);
 
         // properties for the JFrame
         setSize(IMG_WIDTH, IMG_HEIGHT);
@@ -111,7 +118,7 @@ public class Maze extends JFrame implements Runnable{
             lastTime = now;
             // update mostly 60 times in each sec
             while(delta >= 1){
-
+                player.update(map);
 
                 delta --;
             }
