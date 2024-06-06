@@ -5,8 +5,16 @@ public class Player implements KeyListener{
     private final double MOVE_SPEED = 0.8;
     private final double ROTATION_SPEED = 0.045;
 
-    private double xPos, yPos, xDir, yDir, xPlane, yPlane;
-    private boolean left, right, forward, back;
+    private double xPos;
+    private double yPos;
+    private double xDir;
+    private double yDir;
+    private double xPlane;
+    private double yPlane;
+    private boolean left;
+    private boolean right;
+    private boolean forward;
+    private boolean back;
 
     public Player(double xPos, double yPos, double xDir, double yDir, double xPlane, double yPlane){
         this.xPos = xPos;
@@ -15,6 +23,25 @@ public class Player implements KeyListener{
         this.yDir = yDir;
         this.xPlane = xPlane;
         this.yPlane = yPlane;
+    }
+
+    public double getxDir() {
+        return xDir;
+    }
+    public double getyDir() {
+        return yDir;
+    }
+    public double getxPlane() {
+        return xPlane;
+    }
+    public double getyPlane() {
+        return yPlane;
+    }
+    public double getxPos() {
+        return xPos;
+    }
+    public double getyPos() {
+        return yPos;
     }
 
     @Override

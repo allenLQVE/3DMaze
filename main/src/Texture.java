@@ -8,7 +8,7 @@ public class Texture {
     public static Texture brick2 = new Texture("res/brick-subsea.png", 512);
     public static Texture brick_moss = new Texture("res/brick-moss-subsea.png", 512);
 
-    private final int SIZE;
+    public final int SIZE;
     
     private int[] pixels;
     private String location;
@@ -18,6 +18,10 @@ public class Texture {
         SIZE = size;
         pixels = new int[SIZE * SIZE];
         load();
+    }
+
+    public int[] getPixels() {
+        return pixels;
     }
 
     /**

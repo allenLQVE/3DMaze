@@ -41,6 +41,7 @@ public class Maze extends JFrame implements Runnable{
     };
     private ArrayList<Texture> textures;
     private Player player;
+    private Screen screen;
 
     /**
      * Constructor of Maze
@@ -57,6 +58,9 @@ public class Maze extends JFrame implements Runnable{
 
         // default start point
         player = new Player(4.5, 4.5, 1, 0, 0, -.66);
+
+        // default screen
+        screen = new Screen(map, textures, 640, 480);
 
         // properties for the JFrame
         setSize(IMG_WIDTH, IMG_HEIGHT);
@@ -118,6 +122,7 @@ public class Maze extends JFrame implements Runnable{
             lastTime = now;
             // update mostly 60 times in each sec
             while(delta >= 1){
+                screen.update(player, pixels);
                 player.update(map);
 
                 delta --;
