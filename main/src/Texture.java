@@ -1,12 +1,11 @@
 import java.awt.image.BufferedImage;
-import java.io.File;
 
 import javax.imageio.ImageIO;
 
 public class Texture {
     public static Texture brick = new Texture("res/Bricks.png", 64);
-    public static Texture brick2 = new Texture("res/brick-subsea.png", 512);
-    public static Texture brick_moss = new Texture("res/brick-moss-subsea.png", 512);
+    public static Texture brick2 = new Texture("res/brick-subsea64.png", 64);
+    public static Texture brick_moss = new Texture("res/brick-moss-subsea64.png", 64);
 
     public final int SIZE;
     
@@ -29,7 +28,7 @@ public class Texture {
      */
     private void load(){
         try {
-            BufferedImage img = ImageIO.read(new File(location));
+            BufferedImage img = ImageIO.read(getClass().getResource(location));
             img.getRGB(0, 0, img.getWidth(), img.getHeight(), pixels, 0, img.getWidth());
         } catch (Exception e) {
             e.printStackTrace();

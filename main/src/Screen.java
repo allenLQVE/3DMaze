@@ -34,7 +34,7 @@ public class Screen {
         // raycasting
         for (int x = 0; x < width; x++) {
             // direction of ray
-            double cameraX = 2 * x / width - 1;
+            double cameraX = 2 * x / (double)width - 1;
             double rayDirX = player.getxDir() + player.getxPlane() * cameraX;
             double rayDirY = player.getyDir() + player.getyPlane() * cameraX;
 

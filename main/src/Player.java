@@ -2,7 +2,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class Player implements KeyListener{
-    private final double MOVE_SPEED = 0.8;
+    private final double MOVE_SPEED = 0.08;
     private final double ROTATION_SPEED = 0.045;
 
     private double xPos;
@@ -47,7 +47,7 @@ public class Player implements KeyListener{
     @Override
     public void keyTyped(KeyEvent e) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'keyTyped'");
+        // throw new UnsupportedOperationException("Unimplemented method 'keyTyped'");
     }
 
     @Override
@@ -105,16 +105,20 @@ public class Player implements KeyListener{
      */
     public void update(int[][] map){
         if(forward){
-            int newXPos = (int)(xPos + xDir * MOVE_SPEED);
-            int newYPos = (int)(yPos + yDir * MOVE_SPEED);
-
-            move(newXPos, newYPos, map);
+            if(map[(int)(xPos + xDir * MOVE_SPEED)][(int)yPos] == 0){
+                xPos += xDir * MOVE_SPEED;
+            }
+            if(map[(int)xPos][(int)(yPos + yDir * MOVE_SPEED)] == 0){
+                yPos += yDir * MOVE_SPEED;
+            }
         }
         if(back){
-            int newXPos = (int)(xPos - xDir * MOVE_SPEED);
-            int newYPos = (int)(yPos - yDir * MOVE_SPEED);
-
-            move(newXPos, newYPos, map);
+            if(map[(int)(xPos - xDir * MOVE_SPEED)][(int)yPos] == 0){
+                xPos -= xDir * MOVE_SPEED;
+            }
+            if(map[(int)xPos][(int)(yPos - yDir * MOVE_SPEED)] == 0){
+                yPos -= yDir * MOVE_SPEED;
+            }
         }
 
         if(left){
@@ -138,22 +142,6 @@ public class Player implements KeyListener{
             yDir = newYDir;
             xPlane = newXPlane;
             yPlane = newYPlane;
-        }
-    }
-
-    /**
-     * Move the player to the new x and y position on the map
-     * 
-     * @param newXPos
-     * @param newYPos
-     * @param map
-     */
-    private void move(int newXPos, int newYPos, int[][] map){
-        if(map[newXPos][(int)yPos] == Maze.MAP_ROAD){
-            xPos = newXPos;
-        }
-        if(map[(int)xPos][newYPos] == Maze.MAP_ROAD){
-            yPos = newYPos;
         }
     }
 }

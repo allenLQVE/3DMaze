@@ -11,8 +11,8 @@ public class Maze extends JFrame implements Runnable{
     public static final int MAP_WALL = 1;
     public static final int MAP_ROAD = 0;
 
-    private final int MAP_WIDTH = 15;
-    private final int MAP_HEIGHT = 15;
+    // private final int MAP_WIDTH = 15;
+    // private final int MAP_HEIGHT = 15;
     private final int IMG_WIDTH = 640;
     private final int IMG_HEIGHT = 400;
     private final double NANO_SEC = 1000000000.0 / 60.0; // fresh rate for the window, 60 times a sec
@@ -31,13 +31,13 @@ public class Maze extends JFrame implements Runnable{
 			{1,0,3,0,0,0,3,0,2,0,0,0,0,0,2},
 			{1,0,3,3,0,3,3,0,2,0,0,0,0,0,2},
 			{1,0,0,0,0,0,0,0,2,0,0,0,0,0,2},
-			{1,1,1,1,1,1,1,1,4,4,4,0,4,4,4},
-			{1,0,0,0,0,0,1,4,0,0,0,0,0,0,4},
-			{1,0,0,0,0,0,1,4,0,0,0,0,0,0,4},
-			{1,0,0,2,0,0,1,4,0,3,3,3,3,0,4},
-			{1,0,0,0,0,0,1,4,0,3,3,3,3,0,4},
-			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
-			{1,1,1,1,1,1,1,4,4,4,4,4,4,4,4}
+			{1,1,1,1,1,1,1,1,3,3,3,0,3,3,3},
+			{1,0,0,0,0,0,1,3,0,0,0,0,0,0,3},
+			{1,0,0,0,0,0,1,3,0,0,0,0,0,0,3},
+			{1,0,0,2,0,0,1,3,0,3,3,3,3,0,3},
+			{1,0,0,0,0,0,1,3,0,3,3,3,3,0,3},
+			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,3},
+			{1,1,1,1,1,1,1,3,3,3,3,3,3,3,3}
     };
     private ArrayList<Texture> textures;
     private Player player;
@@ -60,7 +60,8 @@ public class Maze extends JFrame implements Runnable{
         player = new Player(4.5, 4.5, 1, 0, 0, -.66);
 
         // default screen
-        screen = new Screen(map, textures, 640, 480);
+        screen = new Screen(map, textures, IMG_WIDTH, IMG_HEIGHT);
+        addKeyListener(player);
 
         // properties for the JFrame
         setSize(IMG_WIDTH, IMG_HEIGHT);
