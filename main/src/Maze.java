@@ -2,12 +2,14 @@ import javax.swing.JFrame;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
 
 public class Maze extends JFrame implements Runnable{
+    public static final int MAP_GOAL = 4;
     public static final int MAP_WALL = 1;
     public static final int MAP_ROAD = 0;
 
@@ -23,9 +25,9 @@ public class Maze extends JFrame implements Runnable{
 
     private int[] pixels; // hold the pixels that displaying to user
     private int[][] map = {
-            {1,1,1,1,1,1,1,1,2,2,2,2,2,2,2},
+            {1,1,1,1,1,4,1,1,2,2,2,2,2,2,2},
 			{1,0,0,0,0,0,0,0,2,0,0,0,0,0,2},
-			{1,2,3,3,3,3,3,0,0,0,0,0,0,0,2},
+			{1,0,3,3,3,3,3,0,0,0,0,0,0,0,2},
 			{1,0,3,0,0,0,3,0,2,0,0,0,0,0,2},
 			{1,0,3,0,0,0,3,0,2,2,2,0,2,2,2},
 			{1,0,3,0,0,0,3,0,2,0,0,0,0,0,2},
@@ -36,7 +38,7 @@ public class Maze extends JFrame implements Runnable{
 			{1,0,0,0,0,0,1,3,0,0,0,0,0,0,3},
 			{1,0,0,2,0,0,1,3,0,3,3,3,3,0,3},
 			{1,0,0,0,0,0,1,3,0,3,3,3,3,0,3},
-			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,3},
+			{1,0,0,0,0,0,0,0,0,0,0,0,0,4,3},
 			{1,1,1,1,1,1,1,3,3,3,3,3,3,3,3}
     };
     private ArrayList<Texture> textures;
@@ -55,6 +57,7 @@ public class Maze extends JFrame implements Runnable{
         textures.add(Texture.brick);
         textures.add(Texture.brick2);
         textures.add(Texture.brick_moss);
+        textures.add(Texture.dark);
 
         // default start point
         player = new Player(1.5, 1.5, .5, 0, 0, -.66);
@@ -87,12 +90,6 @@ public class Maze extends JFrame implements Runnable{
      */
     public synchronized void stop(){
         isRunning = false;
-
-        try {
-            thread.join();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -126,10 +123,15 @@ public class Maze extends JFrame implements Runnable{
                 screen.update(player, pixels);
                 player.update(map);
 
+                if(map[(int)player.getxPos()][(int)player.getyPos()] == MAP_GOAL){
+                    stop();
+                    break;
+                }
                 delta --;
             }
             render();
         }
+        dispose();
     }
     
 }

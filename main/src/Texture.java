@@ -6,6 +6,7 @@ public class Texture {
     public static Texture brick = new Texture("res/Bricks.png", 64);
     public static Texture brick2 = new Texture("res/brick-subsea64.png", 64);
     public static Texture brick_moss = new Texture("res/brick-moss-subsea64.png", 64);
+    public static Texture dark = new Texture("res/dark.png", 64);
 
     public final int SIZE;
     
