@@ -25,7 +25,7 @@ public class Maze extends JFrame implements Runnable{
     private int[][] map = {
             {1,1,1,1,1,1,1,1,2,2,2,2,2,2,2},
 			{1,0,0,0,0,0,0,0,2,0,0,0,0,0,2},
-			{1,0,3,3,3,3,3,0,0,0,0,0,0,0,2},
+			{1,2,3,3,3,3,3,0,0,0,0,0,0,0,2},
 			{1,0,3,0,0,0,3,0,2,0,0,0,0,0,2},
 			{1,0,3,0,0,0,3,0,2,2,2,0,2,2,2},
 			{1,0,3,0,0,0,3,0,2,0,0,0,0,0,2},
@@ -57,7 +57,7 @@ public class Maze extends JFrame implements Runnable{
         textures.add(Texture.brick_moss);
 
         // default start point
-        player = new Player(4.5, 4.5, 1, 0, 0, -.66);
+        player = new Player(1.5, 1.5, .5, 0, 0, -.66);
 
         // default screen
         screen = new Screen(map, textures, IMG_WIDTH, IMG_HEIGHT);

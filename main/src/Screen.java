@@ -56,14 +56,14 @@ public class Screen {
                 sideDistX = (player.getxPos() - xPos) * deltaDistX;
             }else{
                 stepX = 1;
-                sideDistX = (xPos + 1 - player.getxPos()) * deltaDistX;
+                sideDistX = (xPos + 1.0 - player.getxPos()) * deltaDistX;
             }
             if(rayDirY < 0){
                 stepY = -1;
                 sideDistY = (player.getyPos() - yPos) * deltaDistY;
             } else {
                 stepY = 1;
-                sideDistY = (yPos + 1 - player.getyPos()) * deltaDistY;
+                sideDistY = (yPos + 1.0 - player.getyPos()) * deltaDistY;
             }
 
             // side = 0 if hit a horizon (x) or vertical (y) wall
@@ -121,9 +121,9 @@ public class Screen {
             // get the exact position where the wall is hit
             double wallPos;
             if(side == 1){
-                wallPos = player.getxPos() + (((yPos - player.getyPos() + ((1 - stepY) / 2)) / rayDirY) * rayDirX);
+                wallPos = player.getxPos() + rayDirX * ((yPos - player.getyPos() + ((1 - stepY) / 2)) / rayDirY);
             } else {
-                wallPos = player.getyPos() + (((xPos - player.getxPos() + ((1 - stepX) / 2)) / rayDirX) * rayDirY);
+                wallPos = player.getyPos() + rayDirY * ((xPos - player.getxPos() + ((1 - stepX) / 2)) / rayDirX);
             }
             wallPos -= Math.floor(wallPos);
 
@@ -142,7 +142,7 @@ public class Screen {
                 if(side == 0){
                     color = TexturePixels[textureX + (textureY * texture.SIZE)];
                 } else {
-                    color = (TexturePixels[textureX + (textureY * texture.SIZE)] >> 1) & 835571; // make the y-side darker
+                    color = (TexturePixels[textureX + (textureY * texture.SIZE)] >> 1) & 8355711; // make the y-side darker
                 }
                 pixels[x + (y * width)] = color;
             }
