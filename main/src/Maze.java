@@ -61,6 +61,14 @@ public class Maze extends JFrame implements Runnable{
 
         // generate randomized maze
         map = randomMap();
+        for (int[] row : map) {
+            for (int c : row) {
+                System.out.print(c + " ");
+            }
+            System.out.println();
+        }
+        
+
 
         // default start point
         player = new Player(1.5, 1.5, .5, 0, 0, -.66);
@@ -88,7 +96,7 @@ public class Maze extends JFrame implements Runnable{
     private int[][] randomMap() {
         Random rdm = new Random();
 
-        final double ALPHA = .5; // chance of union. samller alpha generates more walls
+        final double ALPHA = .5; // chance of union. samller alpha generates more vertical maze
         // width and height for eller's algorithm
         final int MAZE_WIDTH = 7;
         final int MAZE_HEIGHT = 7;
@@ -99,19 +107,28 @@ public class Maze extends JFrame implements Runnable{
 
         int[][] new_map = new int[MAP_HEIGHT][];
 
-        // first row of the map is all walls
-        new_map[0] = new int[MAP_WIDTH];
-        for (int i = 0; i < MAP_WIDTH; i++) {
-            new_map[0][i] = MAP_WALL;
+        // fill the map with roads suround by walls
+        for (int r = 0; r < MAP_HEIGHT; r++) {
+            new_map[r] = new int[MAP_WIDTH];
+            for (int c = 0; c < MAP_WIDTH; c++) {
+                if(r == 0 || c == 0 || r == MAP_HEIGHT - 1 || c == MAP_WIDTH - 1){
+                    new_map[r][c] = MAP_WALL;
+                } else {
+                    new_map[r][c] = MAP_ROAD;
+                }
+            }
         }
 
         // Eller's Algorithm
-        int[] row;
+        int[] row = new int[MAZE_WIDTH];
+        int mapR;
+        int mapC;
         int[] newRow = new int[MAZE_WIDTH];
         for (int r = 0; r < MAZE_HEIGHT - 1; r++) {
+            mapR = r * 2 + 1;
+
             // a row of the eller's
             if(r == 0){
-                row = new int[MAZE_WIDTH];
                 for (int i = 0; i < row.length; i++) {
                     row[i] = i;
                 }
@@ -120,40 +137,40 @@ public class Maze extends JFrame implements Runnable{
             }
             
             // union cells randomly to create walls
-            for (int i = 0; i < row.length - 1; i++) {
-                if(row[i] != row[i + 1] && rdm.nextDouble() < ALPHA){
-                    row[i + 1] = row[i];
+            for (int c = 0; c < row.length - 1; c++) {
+                mapC = 2 * c + 1;
+                
+                // build a wall between if they are already in a same group
+                if(row[c] == row[c + 1]){
+                    new_map[mapR][mapC + 1] = MAP_WALL;
+                }
+
+                // randomly union cells
+                if(row[c] != row[c + 1] && rdm.nextDouble() < ALPHA){
+                    row[c + 1] = row[c];
                 }
             }
 
             // build the maze by the row
-            int mapR = r * 2 + 1;
-            new_map[mapR] = new int[MAP_WIDTH];
-            new_map[mapR][0] = MAP_WALL;
-            new_map[mapR][MAP_WIDTH - 1] = MAP_WALL;
-
-            new_map[mapR + 1] = new int[MAP_WIDTH];
-            new_map[mapR + 1][0] = MAP_WALL;
-            new_map[mapR + 1][MAP_WIDTH - 1] = MAP_WALL;
             int down = -1;
-
-            newRow = row.clone();
+            System.arraycopy(row, 0, newRow, 0, MAZE_WIDTH);
             int newNum = 0;
-            while(Arrays.asList(row).contains(newNum)){
+            while(Arrays.binarySearch(row, newNum) >= 0){
                 newNum ++;
             }
             for (int c = 0; c < row.length - 1; c++) {
-                int mapC = 2 * c + 1;
-                new_map[mapR][mapC] = MAP_ROAD;
+                mapC = 2 * c + 1;
 
                 // build a wall if two cells belong to different set
                 if(row[c] == row[c + 1]){
-                    new_map[mapR][mapC + 1] = MAP_ROAD;
+                    // if the two cells are not the same set from previous row
+                    if(new_map[mapR][mapC + 1] != MAP_WALL){
+                        new_map[mapR][mapC + 1] = MAP_ROAD;
+                    }
                     
                     // randomly generate down passage
                     if(rdm.nextDouble() < ALPHA){
                         down = row[c];
-                        new_map[mapR + 1][mapC] = MAP_ROAD;
                     } else{
                         new_map[mapR + 1][mapC] = MAP_WALL;
                     }
@@ -163,7 +180,6 @@ public class Maze extends JFrame implements Runnable{
                     // each set has at least one down passage
                     if(row[c] > down || rdm.nextDouble() < ALPHA){
                         down = row[c];
-                        new_map[mapR + 1][mapC] = MAP_ROAD;
                     } else{
                         new_map[mapR + 1][mapC] = MAP_WALL;
                     }
@@ -174,16 +190,32 @@ public class Maze extends JFrame implements Runnable{
                 if(new_map[mapR + 1][mapC] == MAP_WALL){
                     newRow[c] = newNum;
                     newNum ++;
-                    while(Arrays.asList(row).contains(newNum)){
+                    while(Arrays.binarySearch(row, newNum) >= 0){
                         newNum ++;
                     }
                 }
             }
         }
         // create the bottom row
-        
-        
+        if(newRow.length > 0){
+            row = newRow.clone();
+        }
 
+        mapR = (MAZE_HEIGHT - 1) * 2 + 1;
+        // all cells to one set
+        for (int c = 0; c < row.length - 1; c++) {
+            mapC = 2 * c + 1;
+            
+            // build a wall between if they are already in a same group; else, union cells
+            if(row[c] == row[c + 1]){
+                new_map[mapR][mapC + 1] = MAP_WALL;
+            } else {
+                new_map[mapR][mapC + 1] = MAP_ROAD;
+            }
+        }
+        
+        // set the last cell (right down corner) to goal
+        new_map[MAP_WIDTH - 2][MAP_HEIGHT - 2] = MAP_GOAL;
         return new_map;
     }
 
