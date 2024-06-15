@@ -2,19 +2,18 @@ import javax.swing.JFrame;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
 
 public class Maze extends JFrame implements Runnable{
     public static final int MAP_GOAL = 4;
     public static final int MAP_WALL = 1;
     public static final int MAP_ROAD = 0;
 
-    // private final int MAP_WIDTH = 15;
-    // private final int MAP_HEIGHT = 15;
     private final int IMG_WIDTH = 640;
     private final int IMG_HEIGHT = 400;
     private final double NANO_SEC = 1000000000.0 / 60.0; // fresh rate for the window, 60 times a sec
@@ -24,23 +23,24 @@ public class Maze extends JFrame implements Runnable{
     private boolean isRunning;
 
     private int[] pixels; // hold the pixels that displaying to user
-    private int[][] map = {
-            {1,1,1,1,1,4,1,1,2,2,2,2,2,2,2},
-			{1,0,0,0,0,0,0,0,2,0,0,0,0,0,2},
-			{1,0,3,3,3,3,3,0,0,0,0,0,0,0,2},
-			{1,0,3,0,0,0,3,0,2,0,0,0,0,0,2},
-			{1,0,3,0,0,0,3,0,2,2,2,0,2,2,2},
-			{1,0,3,0,0,0,3,0,2,0,0,0,0,0,2},
-			{1,0,3,3,0,3,3,0,2,0,0,0,0,0,2},
-			{1,0,0,0,0,0,0,0,2,0,0,0,0,0,2},
-			{1,1,1,1,1,1,1,1,3,3,3,0,3,3,3},
-			{1,0,0,0,0,0,1,3,0,0,0,0,0,0,3},
-			{1,0,0,0,0,0,1,3,0,0,0,0,0,0,3},
-			{1,0,0,2,0,0,1,3,0,3,3,3,3,0,3},
-			{1,0,0,0,0,0,1,3,0,3,3,3,3,0,3},
-			{1,0,0,0,0,0,0,0,0,0,0,0,0,4,3},
-			{1,1,1,1,1,1,1,3,3,3,3,3,3,3,3}
-    };
+    private int[][] map;
+    // private int[][] map = {
+    //         {1,1,1,1,1,4,1,1,2,2,2,2,2,2,2},
+	// 		{1,0,0,0,0,0,0,0,2,0,0,0,0,0,2},
+	// 		{1,0,3,3,3,3,3,0,0,0,0,0,0,0,2},
+	// 		{1,0,3,0,0,0,3,0,2,0,0,0,0,0,2},
+	// 		{1,0,3,0,0,0,3,0,2,2,2,0,2,2,2},
+	// 		{1,0,3,0,0,0,3,0,2,0,0,0,0,0,2},
+	// 		{1,0,3,3,0,3,3,0,2,0,0,0,0,0,2},
+	// 		{1,0,0,0,0,0,0,0,2,0,0,0,0,0,2},
+	// 		{1,1,1,1,1,1,1,1,3,3,3,0,3,3,3},
+	// 		{1,0,0,0,0,0,1,3,0,0,0,0,0,0,3},
+	// 		{1,0,0,0,0,0,1,3,0,0,0,0,0,0,3},
+	// 		{1,0,0,2,0,0,1,3,0,3,3,3,3,0,3},
+	// 		{1,0,0,0,0,0,1,3,0,3,3,3,3,0,3},
+	// 		{1,0,0,0,0,0,0,0,0,0,0,0,0,4,3},
+	// 		{1,1,1,1,1,1,1,3,3,3,3,3,3,3,3}
+    // };
     private ArrayList<Texture> textures;
     private Player player;
     private Screen screen;
@@ -59,6 +59,9 @@ public class Maze extends JFrame implements Runnable{
         textures.add(Texture.brick_moss);
         textures.add(Texture.dark);
 
+        // generate randomized maze
+        map = randomMap();
+
         // default start point
         player = new Player(1.5, 1.5, .5, 0, 0, -.66);
 
@@ -75,6 +78,113 @@ public class Maze extends JFrame implements Runnable{
         setLocationRelativeTo(null);
         setVisible(true);
         start();
+    }
+
+    /**
+     * Generate a random maze with Eller's Algorithm
+     * 
+     * @return
+     */
+    private int[][] randomMap() {
+        Random rdm = new Random();
+
+        final double ALPHA = .5; // chance of union. samller alpha generates more walls
+        // width and height for eller's algorithm
+        final int MAZE_WIDTH = 7;
+        final int MAZE_HEIGHT = 7;
+
+        // width and height for actual map
+        final int MAP_WIDTH = 2 * MAZE_WIDTH + 1;
+        final int MAP_HEIGHT = 2 * MAZE_HEIGHT + 1;
+
+        int[][] new_map = new int[MAP_HEIGHT][];
+
+        // first row of the map is all walls
+        new_map[0] = new int[MAP_WIDTH];
+        for (int i = 0; i < MAP_WIDTH; i++) {
+            new_map[0][i] = MAP_WALL;
+        }
+
+        // Eller's Algorithm
+        int[] row;
+        int[] newRow = new int[MAZE_WIDTH];
+        for (int r = 0; r < MAZE_HEIGHT - 1; r++) {
+            // a row of the eller's
+            if(r == 0){
+                row = new int[MAZE_WIDTH];
+                for (int i = 0; i < row.length; i++) {
+                    row[i] = i;
+                }
+            } else {
+                row = newRow.clone();
+            }
+            
+            // union cells randomly to create walls
+            for (int i = 0; i < row.length - 1; i++) {
+                if(row[i] != row[i + 1] && rdm.nextDouble() < ALPHA){
+                    row[i + 1] = row[i];
+                }
+            }
+
+            // build the maze by the row
+            int mapR = r * 2 + 1;
+            new_map[mapR] = new int[MAP_WIDTH];
+            new_map[mapR][0] = MAP_WALL;
+            new_map[mapR][MAP_WIDTH - 1] = MAP_WALL;
+
+            new_map[mapR + 1] = new int[MAP_WIDTH];
+            new_map[mapR + 1][0] = MAP_WALL;
+            new_map[mapR + 1][MAP_WIDTH - 1] = MAP_WALL;
+            int down = -1;
+
+            newRow = row.clone();
+            int newNum = 0;
+            while(Arrays.asList(row).contains(newNum)){
+                newNum ++;
+            }
+            for (int c = 0; c < row.length - 1; c++) {
+                int mapC = 2 * c + 1;
+                new_map[mapR][mapC] = MAP_ROAD;
+
+                // build a wall if two cells belong to different set
+                if(row[c] == row[c + 1]){
+                    new_map[mapR][mapC + 1] = MAP_ROAD;
+                    
+                    // randomly generate down passage
+                    if(rdm.nextDouble() < ALPHA){
+                        down = row[c];
+                        new_map[mapR + 1][mapC] = MAP_ROAD;
+                    } else{
+                        new_map[mapR + 1][mapC] = MAP_WALL;
+                    }
+                } else {
+                    new_map[mapR][mapC + 1] = MAP_WALL;
+
+                    // each set has at least one down passage
+                    if(row[c] > down || rdm.nextDouble() < ALPHA){
+                        down = row[c];
+                        new_map[mapR + 1][mapC] = MAP_ROAD;
+                    } else{
+                        new_map[mapR + 1][mapC] = MAP_WALL;
+                    }
+                }
+                new_map[mapR + 1][mapC + 1] = MAP_WALL;
+
+                // build up the new row
+                if(new_map[mapR + 1][mapC] == MAP_WALL){
+                    newRow[c] = newNum;
+                    newNum ++;
+                    while(Arrays.asList(row).contains(newNum)){
+                        newNum ++;
+                    }
+                }
+            }
+        }
+        // create the bottom row
+        
+        
+
+        return new_map;
     }
 
     /**
