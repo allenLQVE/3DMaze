@@ -61,12 +61,12 @@ public class Maze extends JFrame implements Runnable{
 
         // generate randomized maze
         map = randomMap();
-        for (int[] row : map) {
-            for (int c : row) {
-                System.out.print(c + " ");
-            }
-            System.out.println();
-        }
+        // for (int[] row : map) {
+        //     for (int c : row) {
+        //         System.out.print(c + " ");
+        //     }
+        //     System.out.println();
+        // }
         
 
         // default start point
@@ -118,58 +118,83 @@ public class Maze extends JFrame implements Runnable{
             }
         }
 
+        // Eller's algorithm with double linked list
+        // int[] left = new int[MAZE_WIDTH];
+        // int[] right = new int[MAZE_WIDTH];
+        // int mapR;
+        // int mapC;
+
+        // // each cell links to itself
+        // for (int i = 0; i < MAZE_WIDTH; i++) {
+        //     left[i] = right[i] = i;
+        // }
+
+        // for (int r = 0; r < MAZE_HEIGHT - 1; r++) {
+        //     mapR = r * 2 + 1;
+        //     for (int c = 0; c < MAZE_WIDTH - 1; c++) {
+        //         mapC = c * 2 + 1;
+
+        //         // union cells
+        //         if(right[c] != c + 1 && rdm.nextDouble() < ALPHA){
+        //             left[right[c]] = left[c + 1];
+        //             right[left[c + 1]] = right[c];
+        //             left[c + 1] = c;
+        //             right[c] = c + 1;
+        //         } else {
+        //             // build a wall between
+        //             new_map[mapR][mapC + 1] = MAP_WALL;
+        //         }
+
+        //         // down passage
+        //         if(right[c] != c && rdm.nextDouble() < ALPHA){
+        //             // remove c from linked list
+        //             left[right[c]] = left[c];
+        //             right[left[c]] = right[c];
+        //             right[c] = left[c] = c;
+
+        //             // build a wall below
+        //             new_map[mapR + 1][mapC] = MAP_WALL;
+        //         }
+
+        //         new_map[mapR + 1][mapC + 1] = MAP_WALL;
+        //     }
+            
+        //     // down passage for last col
+        //     if(right[MAZE_WIDTH - 1] != MAZE_WIDTH - 1 && rdm.nextDouble() < ALPHA){
+        //         left[right[MAZE_WIDTH - 1]] = left[MAZE_WIDTH - 1];
+        //         right[left[MAZE_WIDTH - 1]] = right[MAZE_WIDTH - 1];
+        //         left[MAZE_WIDTH - 1] = right[MAZE_WIDTH - 1] = MAZE_WIDTH - 1;
+
+        //         new_map[mapR + 1][(MAZE_WIDTH - 1) * 2 + 1] = MAP_WALL;
+        //     }
+        // }
+
+        // // last row
+        // for (int c = 0; c < MAZE_WIDTH - 1; c++) {
+        //     if(right[c] == c +  1){
+        //         new_map[MAZE_HEIGHT - 1][c * 2 + 2] = MAP_WALL;
+        //     }
+        // }
+
         // Eller's Algorithm
         int[] row = new int[MAZE_WIDTH];
+        for (int i = 0; i < MAZE_WIDTH; i++) {
+            row[i] = i;
+        }
         int mapR;
         int mapC;
-        int[] newRow = new int[MAZE_WIDTH];
         for (int r = 0; r < MAZE_HEIGHT - 1; r++) {
             mapR = r * 2 + 1;
-
-            // a row of the eller's
-            if(r == 0){
-                for (int i = 0; i < MAZE_WIDTH; i++) {
-                    row[i] = i;
-                }
-            } else {
-                System.arraycopy(newRow, 0, row, 0, MAZE_WIDTH);
-            }
-
-            // build a wall between if they are already in a same group
-            for (int c = 0; c < row.length - 1; c++) {
-                mapC = 2 * c + 1;
-
-                if(row[c] == row[c + 1]){
-                    new_map[mapR][mapC + 1] = MAP_WALL;
-                }
-            }
             
             // union cells randomly to create walls
+            int down = -1; // use to mark if a set has at least one down passage
+            int newNum = 0; // use to set the cell that do not connect with previous level
             for (int c = 0; c < row.length - 1; c++) {
                 mapC = 2 * c + 1;
-
-                // build a wall if the cell got change to the set with the next cell
-                if(row[c] == row[c + 1]){
-                    new_map[mapR][mapC + 1] = MAP_WALL;
-                }
 
                 if(row[c] != row[c + 1] && rdm.nextDouble() < ALPHA){
                     row[c + 1] = row[c];
-                }
-            }
-
-            // build the maze by the row
-            int down = -1; // use to mark if a set has at least one down passage
-            System.arraycopy(row, 0, newRow, 0, MAZE_WIDTH);
-            int newNum = 0; // use to set the cell that do not connect with previous level
-            while(Arrays.binarySearch(newRow, newNum) >= 0){
-                newNum ++;
-            }
-            for (int c = 0; c < row.length - 1; c++) {
-                mapC = 2 * c + 1;
-
-                // build a wall if two cells belong to different set
-                if(row[c] != row[c + 1]){
+                } else {
                     new_map[mapR][mapC + 1] = MAP_WALL;
                 }
 
@@ -193,58 +218,24 @@ public class Maze extends JFrame implements Runnable{
 
                 // the right down corner of each cell is always wall
                 new_map[mapR + 1][mapC + 1] = MAP_WALL;
-
-                // build up the new row
-                if(new_map[mapR + 1][mapC] == MAP_WALL){
-                    newRow[c] = newNum;
-                    newNum ++;
-                    while(Arrays.binarySearch(newRow, newNum) >= 0){
-                        newNum ++;
-                    }
-                }
             }
-
-            System.out.println("row " + r);
-            for (int num : row) {
-                System.out.print(num);
+            
+            // generate down passage for last col
+            if(rdm.nextDouble() < ALPHA || row[MAZE_WIDTH - 1] != row[MAZE_WIDTH - 2]){
+                down = row[MAZE_WIDTH - 1];
+            } else {
+                new_map[mapR + 1][(MAZE_WIDTH - 1) * 2 + 1] = MAP_WALL;
             }
-            System.out.println();
-            System.out.println("next row " + r);
-            for (int num : newRow) {
-                System.out.print(num);
-            }
-            System.out.println();
-
-            System.out.println("maze generate by row " + r );
-            for (int c : new_map[mapR]) {
-                System.out.print(c);
-            }
-            System.out.println();
-            for (int c : new_map[mapR + 1]) {
-                System.out.print(c);
-            }
-            System.out.println();
         }
-        // create the bottom row
-        if(newRow.length > 0){
-            row = newRow.clone();
-        }
-
-        for (int num : row) {
-            System.out.print(num);
-        }
-        System.out.println();
 
         mapR = (MAZE_HEIGHT - 1) * 2 + 1;
         // all cells to one set
         for (int c = 0; c < row.length - 1; c++) {
             mapC = 2 * c + 1;
             
-            // build a wall between if they are already in a same group; else, union cells
+            // build a wall between if they are already in a same group
             if(row[c] == row[c + 1]){
                 new_map[mapR][mapC + 1] = MAP_WALL;
-            } else {
-                new_map[mapR][mapC + 1] = MAP_ROAD;
             }
         }
         
