@@ -6,7 +6,6 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 public class Maze extends JFrame implements Runnable{
@@ -24,23 +23,6 @@ public class Maze extends JFrame implements Runnable{
 
     private int[] pixels; // hold the pixels that displaying to user
     private int[][] map;
-    // private int[][] map = {
-    //         {1,1,1,1,1,4,1,1,2,2,2,2,2,2,2},
-	// 		{1,0,0,0,0,0,0,0,2,0,0,0,0,0,2},
-	// 		{1,0,3,3,3,3,3,0,0,0,0,0,0,0,2},
-	// 		{1,0,3,0,0,0,3,0,2,0,0,0,0,0,2},
-	// 		{1,0,3,0,0,0,3,0,2,2,2,0,2,2,2},
-	// 		{1,0,3,0,0,0,3,0,2,0,0,0,0,0,2},
-	// 		{1,0,3,3,0,3,3,0,2,0,0,0,0,0,2},
-	// 		{1,0,0,0,0,0,0,0,2,0,0,0,0,0,2},
-	// 		{1,1,1,1,1,1,1,1,3,3,3,0,3,3,3},
-	// 		{1,0,0,0,0,0,1,3,0,0,0,0,0,0,3},
-	// 		{1,0,0,0,0,0,1,3,0,0,0,0,0,0,3},
-	// 		{1,0,0,2,0,0,1,3,0,3,3,3,3,0,3},
-	// 		{1,0,0,0,0,0,1,3,0,3,3,3,3,0,3},
-	// 		{1,0,0,0,0,0,0,0,0,0,0,0,0,4,3},
-	// 		{1,1,1,1,1,1,1,3,3,3,3,3,3,3,3}
-    // };
     private ArrayList<Texture> textures;
     private Player player;
     private Screen screen;
@@ -61,12 +43,13 @@ public class Maze extends JFrame implements Runnable{
 
         // generate randomized maze
         map = randomMap();
-        // for (int[] row : map) {
-        //     for (int c : row) {
-        //         System.out.print(c + " ");
-        //     }
-        //     System.out.println();
-        // }
+        for (int[] row : map) {
+            for (int c : row) {
+                String block = c == 1 ? "\u25A0" : " ";
+                System.out.print(block + " ");
+            }
+            System.out.println();
+        }
         
 
         // default start point
@@ -119,128 +102,71 @@ public class Maze extends JFrame implements Runnable{
         }
 
         // Eller's algorithm with double linked list
-        // int[] left = new int[MAZE_WIDTH];
-        // int[] right = new int[MAZE_WIDTH];
-        // int mapR;
-        // int mapC;
-
-        // // each cell links to itself
-        // for (int i = 0; i < MAZE_WIDTH; i++) {
-        //     left[i] = right[i] = i;
-        // }
-
-        // for (int r = 0; r < MAZE_HEIGHT - 1; r++) {
-        //     mapR = r * 2 + 1;
-        //     for (int c = 0; c < MAZE_WIDTH - 1; c++) {
-        //         mapC = c * 2 + 1;
-
-        //         // union cells
-        //         if(right[c] != c + 1 && rdm.nextDouble() < ALPHA){
-        //             left[right[c]] = left[c + 1];
-        //             right[left[c + 1]] = right[c];
-        //             left[c + 1] = c;
-        //             right[c] = c + 1;
-        //         } else {
-        //             // build a wall between
-        //             new_map[mapR][mapC + 1] = MAP_WALL;
-        //         }
-
-        //         // down passage
-        //         if(right[c] != c && rdm.nextDouble() < ALPHA){
-        //             // remove c from linked list
-        //             left[right[c]] = left[c];
-        //             right[left[c]] = right[c];
-        //             right[c] = left[c] = c;
-
-        //             // build a wall below
-        //             new_map[mapR + 1][mapC] = MAP_WALL;
-        //         }
-
-        //         new_map[mapR + 1][mapC + 1] = MAP_WALL;
-        //     }
-            
-        //     // down passage for last col
-        //     if(right[MAZE_WIDTH - 1] != MAZE_WIDTH - 1 && rdm.nextDouble() < ALPHA){
-        //         left[right[MAZE_WIDTH - 1]] = left[MAZE_WIDTH - 1];
-        //         right[left[MAZE_WIDTH - 1]] = right[MAZE_WIDTH - 1];
-        //         left[MAZE_WIDTH - 1] = right[MAZE_WIDTH - 1] = MAZE_WIDTH - 1;
-
-        //         new_map[mapR + 1][(MAZE_WIDTH - 1) * 2 + 1] = MAP_WALL;
-        //     }
-        // }
-
-        // // last row
-        // for (int c = 0; c < MAZE_WIDTH - 1; c++) {
-        //     if(right[c] == c +  1){
-        //         new_map[MAZE_HEIGHT - 1][c * 2 + 2] = MAP_WALL;
-        //     }
-        // }
-
-        // Eller's Algorithm
-        int[] row = new int[MAZE_WIDTH];
-        for (int i = 0; i < MAZE_WIDTH; i++) {
-            row[i] = i;
-        }
+        int[] left = new int[MAZE_WIDTH];
+        int[] right = new int[MAZE_WIDTH];
         int mapR;
         int mapC;
+
+        // each cell links to itself
+        for (int i = 0; i < MAZE_WIDTH; i++) {
+            left[i] = right[i] = i;
+        }
+
         for (int r = 0; r < MAZE_HEIGHT - 1; r++) {
             mapR = r * 2 + 1;
-            
-            // union cells randomly to create walls
-            int down = -1; // use to mark if a set has at least one down passage
-            int newNum = 0; // use to set the cell that do not connect with previous level
-            for (int c = 0; c < row.length - 1; c++) {
-                mapC = 2 * c + 1;
+            for (int c = 0; c < MAZE_WIDTH - 1; c++) {
+                mapC = c * 2 + 1;
 
-                if(row[c] != row[c + 1] && rdm.nextDouble() < ALPHA){
-                    row[c + 1] = row[c];
+                // union cells
+                if(right[c] != c + 1 && rdm.nextDouble() < ALPHA){
+                    left[right[c]] = left[c + 1];
+                    right[left[c + 1]] = right[c];
+                    left[c + 1] = c;
+                    right[c] = c + 1;
                 } else {
+                    // build a wall between
                     new_map[mapR][mapC + 1] = MAP_WALL;
                 }
 
-                // randomly generate down passage
-                if(rdm.nextDouble() < ALPHA){
-                    down = row[c];
-                } else{
+                // TODO: deal with situation that a set doesn't have down passage
+                // down passage
+                if(right[c] != c && rdm.nextDouble() < ALPHA){
+                    // remove c from linked list
+                    left[right[c]] = left[c];
+                    right[left[c]] = right[c];
+                    right[c] = left[c] = c;
+
+                    // build a wall below
                     new_map[mapR + 1][mapC] = MAP_WALL;
                 }
-                // each set should have at least one down passage
-                if(row[c] != row[c + 1] && row[c] != down){
-                    down = row[c];
-                    int left = c - 1; // find the left bund of the set
-                    while(left > 0 && row[c] == row[left]){
-                        left -= 1;
-                    }
-                    // select a random col from the set
-                    int rdnCell = rdm.nextInt(left, c) + 1;
-                    new_map[mapR + 1][2 * rdnCell + 1] = MAP_ROAD;
-                }
 
-                // the right down corner of each cell is always wall
                 new_map[mapR + 1][mapC + 1] = MAP_WALL;
             }
             
-            // generate down passage for last col
-            if(rdm.nextDouble() < ALPHA || row[MAZE_WIDTH - 1] != row[MAZE_WIDTH - 2]){
-                down = row[MAZE_WIDTH - 1];
-            } else {
+            // down passage for last col
+            if(right[MAZE_WIDTH - 1] != MAZE_WIDTH - 1 && rdm.nextDouble() < ALPHA){
+                left[right[MAZE_WIDTH - 1]] = left[MAZE_WIDTH - 1];
+                right[left[MAZE_WIDTH - 1]] = right[MAZE_WIDTH - 1];
+                left[MAZE_WIDTH - 1] = right[MAZE_WIDTH - 1] = MAZE_WIDTH - 1;
+
                 new_map[mapR + 1][(MAZE_WIDTH - 1) * 2 + 1] = MAP_WALL;
             }
         }
 
-        mapR = (MAZE_HEIGHT - 1) * 2 + 1;
-        // all cells to one set
-        for (int c = 0; c < row.length - 1; c++) {
-            mapC = 2 * c + 1;
-            
-            // build a wall between if they are already in a same group
-            if(row[c] == row[c + 1]){
-                new_map[mapR][mapC + 1] = MAP_WALL;
+        // last row
+        for (int c = 0; c < MAZE_WIDTH - 1; c++) {
+            if(right[c] == c +  1){
+                new_map[MAP_HEIGHT - 2][c * 2 + 2] = MAP_WALL;
+            } else {
+                left[right[c]] = left[c + 1];
+                right[left[c + 1]] = right[c];
+                left[c + 1] = c;
+                right[c] = c + 1;
             }
         }
         
-        // set the last cell (right down corner) to goal
-        new_map[MAP_WIDTH - 2][MAP_HEIGHT - 2] = MAP_GOAL;
+        // set the last cell (right down corner) as goal
+        new_map[MAP_HEIGHT - 1][MAP_WIDTH - 2] = MAP_GOAL;
         return new_map;
     }
 
