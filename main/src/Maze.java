@@ -10,7 +10,7 @@ import java.util.Random;
 
 public class Maze extends JFrame implements Runnable{
     public static final int MAP_GOAL = 4;
-    public static final int MAP_WALL = 1;
+    public static final int MAP_WALL = 2;
     public static final int MAP_ROAD = 0;
 
     private final int IMG_WIDTH = 640;
@@ -39,7 +39,7 @@ public class Maze extends JFrame implements Runnable{
         textures.add(Texture.brick);
         textures.add(Texture.brick2);
         textures.add(Texture.brick_moss);
-        textures.add(Texture.dark);
+        textures.add(Texture.light);
 
         // generate randomized maze
         map = randomMap();
@@ -128,8 +128,8 @@ public class Maze extends JFrame implements Runnable{
                     new_map[mapR][mapC + 1] = MAP_WALL;
                 }
 
-                // TODO: deal with situation that a set doesn't have down passage
-                // down passage
+                // down passage, if all the previous cell in the same group doesn't have down passage, 
+                // the last cell in the group will be the only cell in the group therefore create a down passage
                 if(right[c] != c && rdm.nextDouble() < ALPHA){
                     // remove c from linked list
                     left[right[c]] = left[c];

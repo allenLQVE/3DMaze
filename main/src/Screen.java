@@ -25,10 +25,10 @@ public class Screen {
     public int[] update(Player player, int[] pixels){
         // grayout the screen
         for (int i = 0; i < pixels.length / 2; i++) {
-            pixels[i] = Color.DARK_GRAY.getRGB();
+            pixels[i] = Color.BLACK.getRGB();
         }
         for (int i = pixels.length / 2; i < pixels.length; i++) {
-            pixels[i] = Color.GRAY.getRGB();
+            pixels[i] = 0x1e140a; // brown
         }
 
         // raycasting
