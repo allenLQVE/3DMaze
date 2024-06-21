@@ -43,6 +43,8 @@ public class Maze extends JFrame implements Runnable{
 
         // generate randomized maze
         map = randomMap();
+
+        // print maze to the console
         for (int[] row : map) {
             for (int c : row) {
                 String block = c == 1 ? "\u25A0" : " ";
@@ -58,6 +60,7 @@ public class Maze extends JFrame implements Runnable{
         // default screen
         screen = new Screen(map, textures, IMG_WIDTH, IMG_HEIGHT);
         addKeyListener(player);
+        addMouseListener(player);
 
         // properties for the JFrame
         setSize(IMG_WIDTH, IMG_HEIGHT);
@@ -226,5 +229,4 @@ public class Maze extends JFrame implements Runnable{
         }
         dispose();
     }
-    
 }

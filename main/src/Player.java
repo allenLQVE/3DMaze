@@ -1,9 +1,13 @@
+import java.awt.MouseInfo;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-public class Player implements KeyListener{
+public class Player implements KeyListener, MouseListener{
     private final double MOVE_SPEED = 0.08;
-    private final double ROTATION_SPEED = 0.045;
+    private final double ROTATION_SPEED = 0.06;
+    // private final double ROTATION_SPEED = 0.045;
 
     private double xPos;
     private double yPos;
@@ -11,6 +15,11 @@ public class Player implements KeyListener{
     private double yDir;
     private double xPlane;
     private double yPlane;
+
+    private double prevMouse;
+    private int direct = -1;
+    private boolean rotate = false;
+
     private boolean left;
     private boolean right;
     private boolean forward;
@@ -104,6 +113,38 @@ public class Player implements KeyListener{
      * @param map
      */
     public void update(int[][] map){
+        if(rotate){
+            double mouse = MouseInfo.getPointerInfo().getLocation().getX();
+            // direct is 1 if mouse moving leftward, 0 if rightward
+            direct = prevMouse > mouse ? 0 : 1;
+    
+            // mouse moving to left, rotate leftward
+            if(direct == 1){
+                double newXDir = xDir * Math.cos(ROTATION_SPEED) - yDir * Math.sin(ROTATION_SPEED);
+                double newYDir = xDir * Math.sin(ROTATION_SPEED) + yDir * Math.cos(ROTATION_SPEED);
+                double newXPlane = xPlane * Math.cos(ROTATION_SPEED) - yPlane * Math.sin(ROTATION_SPEED);
+                double newYPlane = xPlane * Math.sin(ROTATION_SPEED) + yPlane * Math.cos(ROTATION_SPEED);
+    
+                xDir = newXDir;
+                yDir = newYDir;
+                xPlane = newXPlane;
+                yPlane = newYPlane;
+    
+            // mouse moving to right, rotate to rightward
+            } else if(direct == 0) {
+                double newXDir = xDir * Math.cos(-1 * ROTATION_SPEED) - yDir * Math.sin(-1 * ROTATION_SPEED);
+                double newYDir = xDir * Math.sin(-1 * ROTATION_SPEED) + yDir * Math.cos(-1 * ROTATION_SPEED);
+                double newXPlane = xPlane * Math.cos(-1 * ROTATION_SPEED) - yPlane * Math.sin(-1 * ROTATION_SPEED);
+                double newYPlane = xPlane * Math.sin(-1 * ROTATION_SPEED) + yPlane * Math.cos(-1 * ROTATION_SPEED);
+    
+                xDir = newXDir;
+                yDir = newYDir;
+                xPlane = newXPlane;
+                yPlane = newYPlane;
+            }
+        }
+        
+        
         if(forward){
             if((map[(int)(xPos + xDir * MOVE_SPEED)][(int)yPos] == Maze.MAP_ROAD) || (map[(int)(xPos + xDir * MOVE_SPEED)][(int)yPos] == Maze.MAP_GOAL)){
                 xPos += xDir * MOVE_SPEED;
@@ -143,5 +184,34 @@ public class Player implements KeyListener{
             xPlane = newXPlane;
             yPlane = newYPlane;
         }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        // TODO Auto-generated method stub
+        // throw new UnsupportedOperationException("Unimplemented method 'mouseClicked'");
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        prevMouse = MouseInfo.getPointerInfo().getLocation().getX();
+        rotate = true;
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        rotate = false;
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        // TODO Auto-generated method stub
+        // throw new UnsupportedOperationException("Unimplemented method 'mouseEntered'");
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        // TODO Auto-generated method stub
+        // throw new UnsupportedOperationException("Unimplemented method 'mouseExited'");
     }
 }
