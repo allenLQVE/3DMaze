@@ -6,7 +6,7 @@ import java.awt.event.MouseListener;
 
 public class Player implements KeyListener, MouseListener{
     private final double MOVE_SPEED = 0.08;
-    private final double ROTATION_SPEED = 0.06;
+    private final double ROTATION_SPEED = 0.08;
     // private final double ROTATION_SPEED = 0.045;
 
     private double xPos;
@@ -117,13 +117,16 @@ public class Player implements KeyListener, MouseListener{
             double mouse = MouseInfo.getPointerInfo().getLocation().getX();
             // direct is 1 if mouse moving leftward, 0 if rightward
             direct = prevMouse > mouse ? 0 : 1;
+
+            // change rotation speed based on mouse distance
+            double rotationSpeed = ROTATION_SPEED * (Math.abs(prevMouse - mouse) / prevMouse);
     
             // mouse moving to left, rotate leftward
             if(direct == 1){
-                double newXDir = xDir * Math.cos(ROTATION_SPEED) - yDir * Math.sin(ROTATION_SPEED);
-                double newYDir = xDir * Math.sin(ROTATION_SPEED) + yDir * Math.cos(ROTATION_SPEED);
-                double newXPlane = xPlane * Math.cos(ROTATION_SPEED) - yPlane * Math.sin(ROTATION_SPEED);
-                double newYPlane = xPlane * Math.sin(ROTATION_SPEED) + yPlane * Math.cos(ROTATION_SPEED);
+                double newXDir = xDir * Math.cos(rotationSpeed) - yDir * Math.sin(rotationSpeed);
+                double newYDir = xDir * Math.sin(rotationSpeed) + yDir * Math.cos(rotationSpeed);
+                double newXPlane = xPlane * Math.cos(rotationSpeed) - yPlane * Math.sin(rotationSpeed);
+                double newYPlane = xPlane * Math.sin(rotationSpeed) + yPlane * Math.cos(rotationSpeed);
     
                 xDir = newXDir;
                 yDir = newYDir;
@@ -132,10 +135,10 @@ public class Player implements KeyListener, MouseListener{
     
             // mouse moving to right, rotate to rightward
             } else if(direct == 0) {
-                double newXDir = xDir * Math.cos(-1 * ROTATION_SPEED) - yDir * Math.sin(-1 * ROTATION_SPEED);
-                double newYDir = xDir * Math.sin(-1 * ROTATION_SPEED) + yDir * Math.cos(-1 * ROTATION_SPEED);
-                double newXPlane = xPlane * Math.cos(-1 * ROTATION_SPEED) - yPlane * Math.sin(-1 * ROTATION_SPEED);
-                double newYPlane = xPlane * Math.sin(-1 * ROTATION_SPEED) + yPlane * Math.cos(-1 * ROTATION_SPEED);
+                double newXDir = xDir * Math.cos(-1 * rotationSpeed) - yDir * Math.sin(-1 * rotationSpeed);
+                double newYDir = xDir * Math.sin(-1 * rotationSpeed) + yDir * Math.cos(-1 * rotationSpeed);
+                double newXPlane = xPlane * Math.cos(-1 * rotationSpeed) - yPlane * Math.sin(-1 * rotationSpeed);
+                double newYPlane = xPlane * Math.sin(-1 * rotationSpeed) + yPlane * Math.cos(-1 * rotationSpeed);
     
                 xDir = newXDir;
                 yDir = newYDir;
