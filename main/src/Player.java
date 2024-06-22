@@ -6,7 +6,7 @@ import java.awt.event.MouseListener;
 
 public class Player implements KeyListener, MouseListener{
     private final double MOVE_SPEED = 0.08;
-    private final double ROTATION_SPEED = 0.08;
+    private final double ROTATION_SPEED = 0.15;
     // private final double ROTATION_SPEED = 0.045;
 
     private double xPos;
@@ -164,28 +164,21 @@ public class Player implements KeyListener, MouseListener{
                 yPos -= yDir * MOVE_SPEED;
             }
         }
-
         if(left){
-            double newXDir = xDir * Math.cos(ROTATION_SPEED) - yDir * Math.sin(ROTATION_SPEED);
-            double newYDir = xDir * Math.sin(ROTATION_SPEED) + yDir * Math.cos(ROTATION_SPEED);
-            double newXPlane = xPlane * Math.cos(ROTATION_SPEED) - yPlane * Math.sin(ROTATION_SPEED);
-            double newYPlane = xPlane * Math.sin(ROTATION_SPEED) + yPlane * Math.cos(ROTATION_SPEED);
-
-            xDir = newXDir;
-            yDir = newYDir;
-            xPlane = newXPlane;
-            yPlane = newYPlane;
+            if((map[(int)(xPos - yDir * MOVE_SPEED)][(int)yPos] == Maze.MAP_ROAD) || (map[(int)(xPos - yDir * MOVE_SPEED)][(int)yPos] == Maze.MAP_GOAL)){
+                xPos -= yDir * MOVE_SPEED;
+            }
+            if((map[(int)xPos][(int)(yPos + xDir * MOVE_SPEED)] == Maze.MAP_ROAD) || (map[(int)xPos][(int)(yPos + xDir * MOVE_SPEED)] == Maze.MAP_GOAL)){
+                yPos += xDir * MOVE_SPEED;
+            }
         }
         if(right){
-            double newXDir = xDir * Math.cos(-1 * ROTATION_SPEED) - yDir * Math.sin(-1 * ROTATION_SPEED);
-            double newYDir = xDir * Math.sin(-1 * ROTATION_SPEED) + yDir * Math.cos(-1 * ROTATION_SPEED);
-            double newXPlane = xPlane * Math.cos(-1 * ROTATION_SPEED) - yPlane * Math.sin(-1 * ROTATION_SPEED);
-            double newYPlane = xPlane * Math.sin(-1 * ROTATION_SPEED) + yPlane * Math.cos(-1 * ROTATION_SPEED);
-
-            xDir = newXDir;
-            yDir = newYDir;
-            xPlane = newXPlane;
-            yPlane = newYPlane;
+            if((map[(int)(xPos + yDir * MOVE_SPEED)][(int)yPos] == Maze.MAP_ROAD) || (map[(int)(xPos + yDir * MOVE_SPEED)][(int)yPos] == Maze.MAP_GOAL)){
+                xPos += yDir * MOVE_SPEED;
+            }
+            if((map[(int)xPos][(int)(yPos - xDir * MOVE_SPEED)] == Maze.MAP_ROAD) || (map[(int)xPos][(int)(yPos - xDir * MOVE_SPEED)] == Maze.MAP_GOAL)){
+                yPos -= xDir * MOVE_SPEED;
+            }
         }
     }
 
