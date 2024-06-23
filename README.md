@@ -1,5 +1,7 @@
 # 3DMaze
 
+This is a 3D maze that generate a random maze. The starting point is the top left of the map and the goal is at the bottom right. The player can move by w, a, s, d or up, left, right, down direction keys. The camera can be rotate by drugging with the mouse.
+
 ToDo:
     1. [Done] Randomize Maze
         generate with maze generate algo then add wall as cells
